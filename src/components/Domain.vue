@@ -1,25 +1,23 @@
 <template>
-  <div class="submit-form">
-    <div>
-      <div class="form-group">
-        <label for="host">Domain</label>
-        <input
-          type="text"
-          class="form-control"
-          required
-          placeholder="Search Domain"
-          v-model="domain"
-        />
+  <div class="col-sm-12 col-md-12">
+    <div class="input-group mb-3">
+      <input type="text" class="form-control" placeholder="Search by Domain"
+        v-model="domain" @keyup.enter="saveDomain"/>
+      <div class="input-group-append">
+        <button class="btn btn-outline-success" type="button"
+          @click="saveDomain" :disabled='loading'
+        >
+          Search
+          
+        </button>
       </div>
-
-      <button @click="saveDomain" v-b-modal.modal-1 class="btn btn-success" :disabled='loading'>Browse</button>
     </div>
-
     <b-modal id="domainInformation" ref="domainInformation" title="BootstrapVue">
       <p class="my-4">Here is the domain information</p>
     </b-modal>
-
   </div>
+
+
 </template>
 
 <script>

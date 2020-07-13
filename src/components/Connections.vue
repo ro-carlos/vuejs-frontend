@@ -2,10 +2,10 @@
    <div class="overflow-auto">
     <div class="col-sm-12 col-md-12">
       <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Search by Domain"
+        <input type="text" class="form-control" placeholder="Filter by Domain"
           v-model="domain" @keyup.enter="searchDomain"/>
         <div class="input-group-append">
-          <button class="btn btn-outline-secondary" type="button"
+          <button class="btn btn-outline-success" type="button"
             @click="searchDomain" :disabled='loading'
           >
             Search
@@ -56,7 +56,8 @@ export default {
           { key: 'isDown', sortable: true },
           { key: 'logo', sortable: true },
           { key: 'title', sortable: true },
-          { key: 'sslGrade', sortable: true }
+          { key: 'sslGrade', sortable: true },
+          { key: 'visited', sortable: true }
         ],
         sortDesc: false,
         connections:[]
