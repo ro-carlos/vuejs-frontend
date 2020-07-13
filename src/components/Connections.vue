@@ -1,20 +1,21 @@
 <template>
   <div class="list row">
-    <div class="col-md-8">
+    <div class="col-sm-12 col-md-12">
       <div class="input-group mb-3">
         <input type="text" class="form-control" placeholder="Search by Domain"
           v-model="domain"/>
         <div class="input-group-append">
           <button class="btn btn-outline-secondary" type="button"
-            @click="searchDomain"
+            @click="searchDomain" :disabled='loading'
           >
             Search
+            
           </button>
         </div>
       </div>
     </div>
-    <div class="col-md-6">
-      <h4>Connections List</h4>
+    <div class="col-sm-6 col-md-6">
+      <h4>Connections</h4>
       <ul class="list-group">
         <li class="list-group-item"
           :class="{ active: index == currentIndex }"
@@ -27,7 +28,7 @@
       </ul>
 
     </div>
-    <div class="col-md-6">
+    <div class="col-sm-6 col-md-6">
       <div v-if="currentConnection">
         <h4>Connection</h4>
         <div>
@@ -57,24 +58,30 @@
 </template>
 
 <script>
+import { bus } from '../main'
 import moment from 'moment';
 import DomainService from "../services/DomainService";
 
 export default {
-  name: "connections-list",
+  name: "connections",
   data() {
     return {
       connections: [],
       currentConnection: null,
       currentIndex: -1,
-      domain: ""
+      domain: "",
+      loading: false
     };
   },
   methods: {
     retrieveConnections() {
+      this.loading = true;
+      bus.$emit('loading', this.loading);
+
       DomainService.getAll()
         .then(response => {
-          this.connections = response.data.items;
+          console.log(response);
+          this.connections = response.data.content.items;
 
           if(this.connections && this.connections.length > 0){
             this.connections.map(element => {
@@ -82,10 +89,20 @@ export default {
             });
           }
 
-          console.log(response);
+          this.loading = false;
+          bus.$emit('loading', this.loading);
         })
         .catch(e => {
           console.log(e);
+          this.loading = false;
+          bus.$emit('loading', this.loading);
+
+          this.$bvToast.toast('Error Retrieving Connections', {
+              title: "Message",
+              toaster: "b-toaster-top-center",
+              variant: "danger",
+              solid: true,
+            })
         });
     },
 
@@ -104,19 +121,43 @@ export default {
       if(!this.domain || this.domain.length === 0){
         this.retrieveConnections();
       }else{
+        this.loading = true
+        bus.$emit('loading', this.loading);
+
         DomainService.findByConnection(this.domain.toUpperCase())
         .then(response => {
-          this.connections = response.data.items;
+          console.log(response);
+          this.connections = response.data.content.items;
 
-         if(this.connections && this.connections.length > 0){
+          this.loading = false
+          bus.$emit('loading', this.loading);
+
+
+          if(!response.data.content.items || (response.data.content.items && response.data.content.items.length === 0 )){
+            this.$bvToast.toast('Domain was not found', {
+              title: "Message",
+              toaster: "b-toaster-top-center",
+              variant: "danger",
+              solid: true,
+            })
+          }
+         else if(this.connections && this.connections.length > 0){
             this.connections.map(element => {
               element.last_update =  moment(String(element.last_update )).format('MM/DD/YYYY hh:mm:ss')
             });
           }
-          console.log(response);
         })
         .catch(e => {
           console.log(e);
+          this.loading = false;
+          bus.$emit('loading', this.loading);
+
+          this.$bvToast.toast('Error Searching Domain', {
+            title: "Message",
+            toaster: "b-toaster-top-center",
+            variant: "danger",
+            solid: true,
+          });
         });
         }
     }

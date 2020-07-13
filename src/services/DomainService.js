@@ -1,6 +1,6 @@
 import http from "../http-common";
 
-class TutorialDataService {
+class DomainService {
   getAll() {
     return http.get("/connections");
   }
@@ -13,4 +13,4 @@ class TutorialDataService {
   }
 }
 
-export default new TutorialDataService();
+export default new DomainService();
