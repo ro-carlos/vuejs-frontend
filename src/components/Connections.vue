@@ -1,9 +1,9 @@
 <template>
-  <div class="list row">
+   <div class="overflow-auto">
     <div class="col-sm-12 col-md-12">
       <div class="input-group mb-3">
         <input type="text" class="form-control" placeholder="Search by Domain"
-          v-model="domain"/>
+          v-model="domain" @keyup.enter="searchDomain"/>
         <div class="input-group-append">
           <button class="btn btn-outline-secondary" type="button"
             @click="searchDomain" :disabled='loading'
@@ -14,46 +14,26 @@
         </div>
       </div>
     </div>
-    <div class="col-sm-6 col-md-6">
-      <h4>Connections</h4>
-      <ul class="list-group">
-        <li class="list-group-item"
-          :class="{ active: index == currentIndex }"
-          v-for="(connection, index) in connections"
-          :key="index"
-          @click="setActiveTutorial(connection, index)"
-        >
-          {{ connection.domain.address }}
-        </li>
-      </ul>
 
-    </div>
-    <div class="col-sm-6 col-md-6">
-      <div v-if="currentConnection">
-        <h4>Connection</h4>
-        <div>
-          <label><strong>Title:</strong></label> {{ currentConnection.domain.title }}
-        </div>
-        <div>
-          <label><strong>Logo:</strong></label> {{ currentConnection.domain.logo }}
-        </div>
-        <div>
-          <label><strong>SSLGrade:</strong></label> {{ currentConnection.domain.ssl_grade }}
-        </div>
-        <div>
-          <label><strong>IsDown:</strong></label> {{ currentConnection.domain.is_down }}
-        </div>
-        <div>
-          <label><strong>Visited:</strong></label> {{ currentConnection.last_update }}
-        </div>
+    <b-table
+      id="ConnectionsTable"
+      :items="pagination.connections"
+      :per-page="pagination.perPage"
+      :fields="pagination.fields"
+      :current-page="pagination.currentPage"
+      :sort-by.sync="pagination.sortBy"
+      :sort-desc.sync="pagination.sortDesc"
+      small
+      sort-icon-left
+      responsive="sm"
+    ></b-table>
+    <b-pagination
+      v-model="pagination.currentPage"
+      :total-rows="rows"
+      :per-page="pagination.perPage"
+      aria-controls="ConnectionsTable"
+    ></b-pagination>
 
-       
-      </div>
-      <div v-else>
-        <br />
-        <p>Please click on a Connection...</p>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -67,29 +47,51 @@ export default {
   name: "connections",
   data() {
     return {
-      connections: [],
+      pagination:{
+        currentPage: 1,
+        perPage: 5,
+        sortBy: 'Visited',
+        fields: [
+          { key: 'address', sortable: true },
+          { key: 'isDown', sortable: true },
+          { key: 'logo', sortable: true },
+          { key: 'title', sortable: true },
+          { key: 'sslGrade', sortable: true }
+        ],
+        sortDesc: false,
+        connections:[]
+      },
       currentConnection: null,
       currentIndex: -1,
       domain: "",
       loading: false
     };
   },
+  computed: {
+    rows() {
+      return this.pagination.connections.length
+    }
+  },
   methods: {
     retrieveConnections() {
+      this.pagination.connections = []
       this.loading = true;
       bus.$emit('loading', this.loading);
 
       DomainService.getAll()
         .then(response => {
           console.log(response);
-          this.connections = response.data.content.items;
+          const items = response.data.content.items;
+          if(items && items.length > 0){
+            items.map(element => {
+              const connection = {address: element.domain.address, isDown: element.domain.is_down, 
+                                  logo: element.domain.logo, sslGrade: element.domain.ssl_grade, title: element.domain.title,
+                                  visited: moment(String(element.last_update )).format('MM/DD/YYYY hh:mm:ss')}
+              this.pagination.connections.push(connection)
 
-          if(this.connections && this.connections.length > 0){
-            this.connections.map(element => {
-              element.last_update =  moment(String(element.last_update )).format('MM/DD/YYYY hh:mm:ss')
             });
           }
-
+          console.log(this.pagination.connections)
           this.loading = false;
           bus.$emit('loading', this.loading);
         })
@@ -117,24 +119,28 @@ export default {
       if(!this.domain || this.domain.length === 0){
         this.retrieveConnections();
       }else{
+        this.pagination.connections = []
         this.loading = true
         bus.$emit('loading', this.loading);
 
         DomainService.findByConnection(this.domain.toUpperCase())
         .then(response => {
           console.log(response);
-          this.connections = response.data.content.items;
 
           this.loading = false
           bus.$emit('loading', this.loading);
 
-
-          if(!response.data.content.items || (response.data.content.items && response.data.content.items.length === 0 )){
+          const items = response.data.content.items;
+          if(!items || (items && items.length === 0 )){
             ToastService.displayErrorMessage(this.$bvToast, "Message", "Domain Was Not Found");
           }
-         else if(this.connections && this.connections.length > 0){
-            this.connections.map(element => {
-              element.last_update =  moment(String(element.last_update )).format('MM/DD/YYYY hh:mm:ss')
+          else if(items && items.length > 0){
+            items.map(element => {
+              const connection = {address: element.domain.address, isDown: element.domain.is_down, 
+                                  logo: element.domain.logo, sslGrade: element.domain.ssl_grade, title: element.domain.title,
+                                  visited: moment(String(element.last_update )).format('MM/DD/YYYY hh:mm:ss')}
+              this.pagination.connections.push(connection)
+
             });
           }
         })
@@ -154,9 +160,12 @@ export default {
 </script>
 
 <style>
-.list {
-  text-align: left;
-  max-width: 750px;
-  margin: auto;
-}
+  .list {
+    text-align: left;
+    max-width: 750px;
+    margin: auto;
+  }
+  .pagination{
+    justify-content: center;
+  }
 </style>
