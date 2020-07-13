@@ -25,6 +25,7 @@
 <script>
 import { bus } from '../main'
 import DomainService from "../services/DomainService";
+import ToastService from "../services/ToastService";
 
 
 export default {
@@ -55,12 +56,7 @@ export default {
             if(response.data.valid){
               this.$refs['domainInformation'].show()
             }else{
-              this.$bvToast.toast('Invalid Domain', {
-                title: "Message",
-                toaster: "b-toaster-top-center",
-                variant: "danger",
-                solid: true,
-              })
+              ToastService.displayErrorMessage(this.$bvToast, "Message", "Invalid Domain");
             }
 
           })
@@ -68,13 +64,7 @@ export default {
             console.log(e);
             this.loading = false;
             bus.$emit('loading', this.loading);
-
-            this.$bvToast.toast('Error Browsing Domain', {
-              title: "Message",
-              toaster: "b-toaster-top-center",
-              variant: "danger",
-              solid: true,
-            })
+            ToastService.displayErrorMessage(this.$bvToast, "Message", "Error Browsing Domain");
           });
       }
     }

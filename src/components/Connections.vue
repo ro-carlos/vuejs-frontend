@@ -61,6 +61,7 @@
 import { bus } from '../main'
 import moment from 'moment';
 import DomainService from "../services/DomainService";
+import ToastService from "../services/ToastService";
 
 export default {
   name: "connections",
@@ -97,12 +98,7 @@ export default {
           this.loading = false;
           bus.$emit('loading', this.loading);
 
-          this.$bvToast.toast('Error Retrieving Connections', {
-              title: "Message",
-              toaster: "b-toaster-top-center",
-              variant: "danger",
-              solid: true,
-            })
+          ToastService.displayErrorMessage(this.$bvToast, "Message", "Error Retrieving Connections");
         });
     },
 
@@ -134,12 +130,7 @@ export default {
 
 
           if(!response.data.content.items || (response.data.content.items && response.data.content.items.length === 0 )){
-            this.$bvToast.toast('Domain was not found', {
-              title: "Message",
-              toaster: "b-toaster-top-center",
-              variant: "danger",
-              solid: true,
-            })
+            ToastService.displayErrorMessage(this.$bvToast, "Message", "Domain Was Not Found");
           }
          else if(this.connections && this.connections.length > 0){
             this.connections.map(element => {
@@ -151,13 +142,7 @@ export default {
           console.log(e);
           this.loading = false;
           bus.$emit('loading', this.loading);
-
-          this.$bvToast.toast('Error Searching Domain', {
-            title: "Message",
-            toaster: "b-toaster-top-center",
-            variant: "danger",
-            solid: true,
-          });
+          ToastService.displayErrorMessage(this.$bvToast, "Message", "Error Searching Domain");
         });
         }
     }
