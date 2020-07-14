@@ -16,6 +16,7 @@
     </div>
 
     <b-table
+      v-if="pagination.connections && pagination.connections.length >0"
       id="ConnectionsTable"
       :items="pagination.connections"
       :per-page="pagination.perPage"
@@ -28,6 +29,7 @@
       responsive="sm"
     ></b-table>
     <b-pagination
+      v-if="pagination.connections && pagination.connections.length >0"
       v-model="pagination.currentPage"
       :total-rows="rows"
       :per-page="pagination.perPage"

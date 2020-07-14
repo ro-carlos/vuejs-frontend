@@ -8,14 +8,14 @@ export default new Router({
   routes: [
     {
       path: "/",
-      alias: "/connections",
-      name: "connections",
-      component: () => import("./components/Connections"),
-    },
-    {
-      path: "/domain",
+      alias: "/domain",
       name: "domain",
       component: () => import("./components/Domain"),
+    },
+    {
+      path: "/connections",
+      name: "connections",
+      component: () => import("./components/Connections"),
     },
   ],
 });

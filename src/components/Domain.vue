@@ -32,9 +32,9 @@
         <b-card-group columns>
           <b-card bg-variant="info" text-variant="white" :header="server.address" class="text-center" v-for="(server, index) in domain.servers" :key="index">
             <b-card-text>
-              <div v-if="server.ssl_grade"> <strong>SSL Grade: </strong> {{server.ssl_grade}} <br> </div>
-              <div v-if="server.country"> <strong>Country: </strong> {{server.country}} <br> </div>
-              <div v-if="server.owner"> <strong>Owner: </strong> {{server.owner}} <br> </div>
+              <div> <strong>SSL Grade: </strong> {{server.ssl_grade}} <br> </div>
+              <div> <strong>Country: </strong> {{server.country}} <br> </div>
+              <div> <strong>Owner: </strong> {{server.owner}} <br> </div>
             </b-card-text>
           </b-card>
         </b-card-group>
