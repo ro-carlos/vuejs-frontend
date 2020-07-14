@@ -29,7 +29,7 @@
 
       <br><br>
       <div class="mt-3">
-        <b-card-group deck>
+        <b-card-group columns>
           <b-card bg-variant="info" text-variant="white" :header="server.address" class="text-center" v-for="(server, index) in domain.servers" :key="index">
             <b-card-text>
               <div v-if="server.ssl_grade"> <strong>SSL Grade: </strong> {{server.ssl_grade}} <br> </div>
